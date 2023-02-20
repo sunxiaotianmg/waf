@@ -56,21 +56,33 @@ local function log(method,url,data,ruletag)
     end
 end
 ------------------------------------规则读取函数-------------------------------------------------------------------
-local function read_rule(var)
-    file = io.open(rulepath..'/'..var,"r")
-    if file==nil then
-        return
-    end
-    t = {}
-    for line in file:lines() do
-        table.insert(t,line)
-    end
-    file:close()
-    return(t)
-end
+--local function read_rule(var)
+--    file = io.open(rulepath..'/'..var,"r")
+--    if file==nil then
+--        return
+--    end
+--    t = {}
+--    for line in file:lines() do
+--        table.insert(t,line)
+--    end
+--    file:close()
+--    return(t)
+--end
+
+--local function read_json(var)
+--    file = io.open(rulepath..'/'..var,"r")
+--    if file==nil then
+--        return
+--    end
+--    str = file:read("*a")
+--    file:close()
+--    list = cjson.decode(str)
+--    return list
+--end
+
 
 local function read_json(var)
-    file = io.open(rulepath..'/'..var,"r")
+    file = io.open(rulepath..'/'..var .. '.json',"r")
     if file==nil then
         return
     end
@@ -78,6 +90,19 @@ local function read_json(var)
     file:close()
     list = cjson.decode(str)
     return list
+end
+
+
+local function select_rules(rules)
+    if not rules then return {} end
+    new_rules = {}
+    for i,v in ipairs(rules) do
+        if v[1] == 1 then
+            print("111")
+            table.insert(new_rules,v[2])
+        end
+    end
+    return new_rules
 end
 
 local function read_str(var)
@@ -90,20 +115,19 @@ local function read_str(var)
     return str
 end
 
+local argsCheckList=select_rules(read_json('args_check'))
+local postCheckList=select_rules(read_json('post_check'))
+local cookieBlockList=select_rules(read_json('cookie_block'))
+local uarules=select_rules(read_json('user_agent'))
 
+local urlWhiteList=read_json('url_white')
+local urlBlockList=read_json('url_block')
+local ipWhiteList=read_json('ip_white')
+local ipBlockList=read_json('ip_block')
+local fileExtBlockList = read_json('file_ext_block')
 
-local urlWhiteList=read_rule('urlWhiteList')
-local urlBlockList=read_rule('urlBlockList')
-local argsCheckList=read_rule('argsCheckList')
-local postCheckList=read_rule('postCheckList')
-local cookieBlockList=read_rule('cookieBlockList')
-local ipWhiteList=read_json('ipWhiteList')
-local ipBlockList=read_json('ipBlockList')
-local ccRate=read_str('ccRate')
-local fileExtBlockList = read_json('fileExtBlockList')
-
+local ccRate=read_str('cc.json')
 local html=read_str('html')
-local uarules=read_rule('user-agent')
 
 local function say_html()
     if Redirect then
